@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.under.discord.config.BotProperties;
 import com.under.discord.session.SessionComponent;
 import com.under.discord.session.domain.SessionRecordStatisticsCSV;
 import com.under.discord.session.domain.SessionRecordStatistic;
@@ -35,21 +36,27 @@ public class SessionCommandListener extends ListenerAdapter {
     private static final Logger logger = getLogger(SessionCommandListener.class);
     private final SessionComponent sessionComponent;
     private final CsvMapper csvMapper;
+    private final BotProperties botProperties;
 
     @Autowired
-    public SessionCommandListener(SessionComponent sessionComponent, 
-                                  CsvMapper csvMapper) {
+    public SessionCommandListener(SessionComponent sessionComponent,
+                                  CsvMapper csvMapper, 
+                                  BotProperties botProperties) {
         this.sessionComponent = sessionComponent;
         this.csvMapper = csvMapper;
+        this.botProperties = botProperties;
     }
 
     @Override
     public void onPrivateMessageReceived(PrivateMessageReceivedEvent event) {
+        List<String> adminNames = botProperties.getAdminNames();
         if( Check.authorIsBot(event) ) {
             return;
         }
-        
-        // TODO: check if author is in "admin list"
+        if( !Check.isAuthorized(event.getAuthor().getName(), adminNames) ) {
+            this.reply(event, "You're not an admin");
+            return;
+        }
 
         String content = event.getMessage().getContent();
         if( "!start".equalsIgnoreCase(content) ) {

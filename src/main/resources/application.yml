@@ -1,5 +1,6 @@
 bot:
   token: ${BOT_TOKEN}
+#  admin-names: comma-seperated values
   
 # cron parts
 # startSessionCron
