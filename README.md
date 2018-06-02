@@ -2,26 +2,33 @@
 
 #### Start a session
 ```bash 
-    !start          
+    !session:start          
 ```
 
 #### Stop a session
 ```bash        
-    !stop
+    !session:stop
 ```
 
 
-#### Report last presence list session
+#### Report all presence list sessions
 ```bash
-    !read:last      
+    !session:all      
 ```
-TODO : 
-- set csv export as a parameter option
 
-#### Report since past date the presence list session
+#### Presence list of every users of every sessions since "from_date"
 
 ```bash
-    !read:from <from_date>     
+    !session:from <from_date>     
+```
+
+from_date
+- format: `yyyy-MM-dd`
+
+#### Presence statistics of every users of every sessions since "from_date"
+
+```bash
+    !session:stats <from_date>     
 ```
 TODO :
 - set csv export as a parameter option
@@ -31,13 +38,14 @@ from_date
 
 #### Remove a user presence of a specific session
 ```bash
-    !remove <user_name> <session_date>
+    !session:remove <user_name> <session_date>
 ```
 TODO :
 - command implementation
 
 user_name :
-- can be found through !read section commands
+- can be found through `!session:all` or `!session:from` commands
+
 session_date : 
 - format: `yyyy-MM-dd`
 

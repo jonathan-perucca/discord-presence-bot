@@ -25,6 +25,6 @@ public class SessionJob {
     // TODO : set a stopSession timing
 //    @Scheduled(cron = "")
     public void stopSession() {
-        sessionComponent.stopSession();
+        sessionComponent.stopSession(null);
     }
 }

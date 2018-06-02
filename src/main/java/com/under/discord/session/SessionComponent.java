@@ -5,6 +5,7 @@ import com.under.discord.session.domain.SessionRecordStatistic;
 import com.under.discord.session.entity.SessionRecord;
 import com.under.discord.session.entity.SessionRecordRepository;
 import com.under.discord.session.event.SessionStopped;
+import net.dv8tion.jda.core.events.message.GenericMessageEvent;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -41,13 +42,23 @@ public class SessionComponent {
         sessionRecordRepository.save(sessionRecords);
     }
 
+    @Transactional
+    public void save(SessionRecord sessionRecord) {
+        sessionRecordRepository.save(sessionRecord);
+    }
+
     @Transactional(readOnly = true)
-    public List<SessionRecord> getSessionRecordsFrom() {
+    public List<SessionRecord> getAllSessionRecords() {
         return sessionRecordRepository.findAll();
     }
 
     @Transactional(readOnly = true)
-    public List<SessionRecordStatistic> getSessionRecordsFrom(LocalDate fromDate) {
+    public List<SessionRecord> getSessionRecordsFrom(LocalDate fromDate) {
+        return sessionRecordRepository.findByStartDateAfter(fromDate);
+    }
+    
+    @Transactional(readOnly = true)
+    public List<SessionRecordStatistic> getSessionRecordStatsFrom(LocalDate fromDate) {
         List<SessionRecord> sessionRecords = sessionRecordRepository.findByStartDateAfter(fromDate);
 
         Map<String, Long> presenceMap = sessionRecords.stream()
@@ -57,7 +68,7 @@ public class SessionComponent {
                 .map(this::toStatistic)
                 .collect(toList());
     }
-
+    
     private SessionRecordStatistic toStatistic(Map.Entry<String, Long> entry) {
         return SessionRecordStatistic.builder()
                 .user(entry.getKey())
@@ -74,13 +85,13 @@ public class SessionComponent {
         return this.currentSession.get();
     }
 
-    public void stopSession() {
+    public void stopSession(GenericMessageEvent event) {
         if(!this.currentSession.isPresent()) {
             logger.debug("Session cannot be stopped, session was not started");
             return;
         }
 
-        eventPublisher.publishEvent( new SessionStopped(this.currentSession.get()) );
+        eventPublisher.publishEvent( SessionStopped.with(this.currentSession.get(), event) );
         this.currentSession = Optional.empty();
     }
 

@@ -1,11 +1,8 @@
 package com.under.discord.session.discord;
 
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.under.discord.config.BotProperties;
 import com.under.discord.session.SessionComponent;
 import com.under.discord.session.domain.SessionRecordStatisticsCSV;
@@ -23,11 +20,11 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
-import static java.util.Arrays.asList;
 import static org.slf4j.LoggerFactory.getLogger;
 
 @Component
@@ -40,7 +37,7 @@ public class SessionCommandListener extends ListenerAdapter {
 
     @Autowired
     public SessionCommandListener(SessionComponent sessionComponent,
-                                  CsvMapper csvMapper, 
+                                  CsvMapper csvMapper,
                                   BotProperties botProperties) {
         this.sessionComponent = sessionComponent;
         this.csvMapper = csvMapper;
@@ -59,22 +56,22 @@ public class SessionCommandListener extends ListenerAdapter {
         }
 
         String content = event.getMessage().getContent();
-        if( "!start".equalsIgnoreCase(content) ) {
+        if( "!session:start".equalsIgnoreCase(content) ) {
             sessionComponent.startSession();
 
             this.reply(event, "Session started");
         }
-        
-        if( "!stop".equalsIgnoreCase(content) ) {
-            sessionComponent.stopSession();
+
+        if( "!session:stop".equalsIgnoreCase(content) ) {
+            sessionComponent.stopSession(event);
 
             this.reply(event, "Session stopped");
         }
-        
-        if( "!read:last".equalsIgnoreCase(content)) {
-            List<SessionRecord> sessionRecords = sessionComponent.getSessionRecordsFrom();
+
+        if( "!session:all".equalsIgnoreCase(content)) {
+            List<SessionRecord> sessionRecords = sessionComponent.getAllSessionRecords();
             String sessionRecordTextReport = toText(sessionRecords);
-            
+
             if(sessionRecordTextReport.trim().isEmpty()) {
                 sessionRecordTextReport = "No record found";
             }
@@ -82,27 +79,43 @@ public class SessionCommandListener extends ListenerAdapter {
             this.reply(event, sessionRecordTextReport);
         }
 
-        String readFromCommand = "!read:from";
+        String sessionFromCommand = "!session:from";
+        if( content.startsWith(sessionFromCommand) ) {
+            String singleArgument = content.replace(sessionFromCommand, "").trim();
+
+            Optional<LocalDate> fromDate = parseToLocalDate(singleArgument);
+            if(!fromDate.isPresent()) {
+                String dateFormatErrorMessage = errorMessageDateFormat(singleArgument);
+
+                this.reply(event, dateFormatErrorMessage);
+                return;
+            }
+
+            LocalDate startDate = fromDate.get();
+            this.reply(event, toText( sessionComponent.getSessionRecordsFrom(startDate) ));
+        }
+
+        String readFromCommand = "!session:stats";
         if( content.startsWith(readFromCommand) ) {
             String singleArgument = content.replace(readFromCommand, "").trim();
 
             Optional<LocalDate> fromDate = parseToLocalDate(singleArgument);
             if(!fromDate.isPresent()) {
                 String dateFormatErrorMessage = errorMessageDateFormat(singleArgument);
-                
+
                 this.reply(event, dateFormatErrorMessage);
                 return;
             }
 
             LocalDate startDate = fromDate.get();
-            List<SessionRecordStatistic> sessionRecordStats = sessionComponent.getSessionRecordsFrom(startDate);
-            
+            List<SessionRecordStatistic> sessionRecordStats = sessionComponent.getSessionRecordStatsFrom(startDate);
             if(sessionRecordStats.isEmpty()) {
                 this.reply(event, format("No session record found for date %s", fromDate.toString()));
                 return;
             }
             
-            this.replyReport(event, sessionRecordStats);
+            // TODO : csv as an option
+            // this.replyReportAsCsv(event, sessionRecordStats);
         }
     }
 
@@ -110,16 +123,16 @@ public class SessionCommandListener extends ListenerAdapter {
         PrivateChannel privateChannel = event.getMessage().getPrivateChannel();
         privateChannel.sendMessage(sessionRecordTextReport).queue();
     }
-    
-    private void replyReport(PrivateMessageReceivedEvent event, List<SessionRecordStatistic> sessionRecordStats) {
+
+    private void replyReportAsCsv(PrivateMessageReceivedEvent event, List<SessionRecordStatistic> sessionRecordStats) {
         CsvSchema csvSchema = csvMapper.schemaFor(SessionRecordStatisticsCSV.class).withHeader();
         String recordsAsCSV = "No entry";
-        
+
         try {
             recordsAsCSV = csvMapper.writer(csvSchema).writeValueAsString(sessionRecordStats);
         } catch (JsonProcessingException e) {
             String csvWriteErrorMessage = "Could not write CSV file";
-            
+
             logger.error(csvWriteErrorMessage, e);
             this.reply(event, csvWriteErrorMessage);
             return;
@@ -130,9 +143,20 @@ public class SessionCommandListener extends ListenerAdapter {
     }
 
     private String toText(List<SessionRecord> sessionRecords) {
-        return sessionRecords.stream()
-                .map(SessionRecord::toString)
-                .collect(Collectors.joining("\n"));
+        StringBuilder builder = new StringBuilder();
+
+        Map<LocalDate, List<SessionRecord>> recordsByDate
+                = sessionRecords.stream().collect( Collectors.groupingBy(SessionRecord::getStartDate) );
+
+        recordsByDate.forEach((sessionDate, sessionRecordsEntry) -> {
+
+            builder.append( "Session of " ).append( sessionDate ).append( "\n" );
+            sessionRecordsEntry.forEach(sessionRecord ->
+                    builder.append( sessionRecord.getUser() ).append( "\n" )
+            );
+        });
+
+        return builder.toString();
     }
 
     private Optional<LocalDate> parseToLocalDate(String dateAsString) {
@@ -143,32 +167,8 @@ public class SessionCommandListener extends ListenerAdapter {
             return Optional.empty();
         }
     }
-    
+
     private String errorMessageDateFormat(String dateAsString) {
         return format("Argument %s is not in format YYYY-MM-dd", dateAsString);
-    }
-
-    public static void main(String[] args) {
-        List<SessionRecordStatistic> sessionRecordStats = asList(
-                SessionRecordStatistic.builder().presenceTimes("2").user("under").build(),
-                SessionRecordStatistic.builder().presenceTimes("1").user("lukile").build()
-        );
-        
-        CsvMapper csvMapper = new CsvMapper();
-        csvMapper.configure(JsonGenerator.Feature.IGNORE_UNKNOWN, true);
-        csvMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        csvMapper.registerModule(new JavaTimeModule());
-        csvMapper.addMixIn(SessionRecordStatistic.class, SessionRecordStatisticsCSV.class);
-        
-        CsvSchema csvSchema = csvMapper.schemaFor(SessionRecordStatisticsCSV.class).withHeader();
-        String recordsAsCSV = "No entry";
-
-        try {
-            recordsAsCSV = csvMapper.writer(csvSchema).writeValueAsString(sessionRecordStats);
-        } catch (JsonProcessingException e) {
-            logger.error("Could not write CSV file", e);
-        }
-
-        System.out.println( recordsAsCSV );
     }
 }
