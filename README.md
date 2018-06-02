@@ -42,6 +42,13 @@ session_date :
 - format: `yyyy-MM-dd`
 
 
+#### Helper command
+```
+    !help
+```
+TODO :
+- command implementation
+
 # Automatic behavior
 
 #### Session start each ...
