@@ -28,7 +28,7 @@ from_date
 #### Presence statistics of every users of every sessions since "from_date"
 
 ```bash
-    !session:stats <from_date>     
+    !session:stats from <from_date>     
 ```
 TODO :
 - set csv export as a parameter option
@@ -38,7 +38,7 @@ from_date
 
 #### Remove a user presence of a specific session
 ```bash
-    !session:remove <user_name> <session_date>
+    !session:remove user <user_name> on <session_date>
 ```
 TODO :
 - command implementation

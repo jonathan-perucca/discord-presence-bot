@@ -21,8 +21,6 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -32,14 +30,17 @@ public class SessionCommandListener extends ListenerAdapter {
 
     private static final Logger logger = getLogger(SessionCommandListener.class);
     private final SessionComponent sessionComponent;
+    private final Display display;
     private final CsvMapper csvMapper;
     private final BotProperties botProperties;
 
     @Autowired
     public SessionCommandListener(SessionComponent sessionComponent,
+                                  Display display, 
                                   CsvMapper csvMapper,
                                   BotProperties botProperties) {
         this.sessionComponent = sessionComponent;
+        this.display = display;
         this.csvMapper = csvMapper;
         this.botProperties = botProperties;
     }
@@ -70,7 +71,7 @@ public class SessionCommandListener extends ListenerAdapter {
 
         if( "!session:all".equalsIgnoreCase(content)) {
             List<SessionRecord> sessionRecords = sessionComponent.getAllSessionRecords();
-            String sessionRecordTextReport = toText(sessionRecords);
+            String sessionRecordTextReport = display.recordsToText(sessionRecords);
 
             if(sessionRecordTextReport.trim().isEmpty()) {
                 sessionRecordTextReport = "No record found";
@@ -84,12 +85,13 @@ public class SessionCommandListener extends ListenerAdapter {
             LocalDate startDate = Parser.parseOptionAsDate(event, sessionFromCommand);
             if (startDate == null) return;
             
-            MessageTool.reply(event, toText( sessionComponent.getSessionRecordsFrom(startDate) ));
+            MessageTool.reply(event, display.recordsToText( sessionComponent.getSessionRecordsFrom(startDate) ));
         }
 
-        String readFromCommand = "!session:stats";
-        if( content.startsWith(readFromCommand) ) {
-            LocalDate startDate = Parser.parseOptionAsDate(event, readFromCommand);
+        String statsCommand = "!session:stats";
+        if( content.startsWith(statsCommand) ) {
+            Options options = Parser.parseOptions(event, content, statsCommand);
+            LocalDate startDate = Parser.parseOptionAsDate(event, options.get("from").getValue());
             if(startDate == null) return;
             
             List<SessionRecordStatistic> sessionRecordStats = sessionComponent.getSessionRecordStatsFrom(startDate);
@@ -97,6 +99,8 @@ public class SessionCommandListener extends ListenerAdapter {
                 MessageTool.reply(event, format("No session record found for date %s", startDate.toString()));
                 return;
             }
+            
+            MessageTool.reply(event, display.statsToText(sessionRecordStats));
             
             // TODO : csv as an option
             // this.replyReportAsCsv(event, sessionRecordStats);
@@ -121,20 +125,5 @@ public class SessionCommandListener extends ListenerAdapter {
         privateChannel.sendFile(recordsAsCSV.getBytes(), "report.txt", new MessageBuilder().append("Report done").build()).queue();
     }
 
-    private String toText(List<SessionRecord> sessionRecords) {
-        StringBuilder builder = new StringBuilder();
-
-        Map<LocalDate, List<SessionRecord>> recordsByDate
-                = sessionRecords.stream().collect( Collectors.groupingBy(SessionRecord::getStartDate) );
-
-        recordsByDate.forEach((sessionDate, sessionRecordsEntry) -> {
-
-            builder.append( "Session of " ).append( sessionDate ).append( "\n" );
-            sessionRecordsEntry.forEach(sessionRecord ->
-                    builder.append( sessionRecord.getUser() ).append( "\n" )
-            );
-        });
-
-        return builder.toString();
-    }
+    
 }
