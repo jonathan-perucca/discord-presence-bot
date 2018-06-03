@@ -74,9 +74,10 @@ public class SessionCommandListener extends ListenerAdapter {
             messageTool.reply(event, sessionRecordTextReport);
         }
 
-        String sessionFromCommand = "!session:from";
+        String sessionFromCommand = "!session:list";
         if( content.startsWith(sessionFromCommand) ) {
-            LocalDate startDate = parser.parseOptionAsDate(event, sessionFromCommand);
+            Options options = parser.parseOptions(event, content, sessionFromCommand);
+            LocalDate startDate = parser.parseOptionAsDate(event, options.get("from").getValue());
             if (startDate == null) return;
 
             messageTool.reply(event, display.recordsToText( sessionComponent.getSessionRecordsFrom(startDate) ));

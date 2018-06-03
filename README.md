@@ -10,16 +10,15 @@
     !session:stop
 ```
 
-
-#### Report all presence list sessions
-```bash
-    !session:all      
-```
-
 #### Presence list of every users of every sessions since "from_date"
 
 ```bash
-    !session:from <from_date>     
+    !session:list from <from_date>     
+```
+
+#### All presence list sessions
+```bash
+    !session:all      
 ```
 
 from_date
