@@ -92,12 +92,24 @@ session_date :
 TODO :
 - command implementation
 
-# Automatic behavior
+# Install
 
-#### Session start each ...
+### Package from source
+```bash 
+    mvn package
 ```
-    At application launch : 
-    java -jar discord-presence-bot.jar \
-        -Dcron.session.start= * * * * * *
-        -Dcron.session.stop= * * * * * *
+
+#### Launch bot
+```bash
+    java -jar discord-presence-bot-0.0.1-SNAPSHOT.jar -Dspring.config.location=<path_to_conf_folder>/
+```
+
+#### Launch configuration file
+
+###### application.properties
+```
+    BOT_TOKEN=...
+    bot.admin-names=... // comma-seperated values
+    cron.session.start=0 0 21 * * WED
+    cron.session.stop=0 0 0 * * THU
 ```

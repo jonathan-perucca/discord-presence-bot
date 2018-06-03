@@ -1,10 +1,10 @@
 bot:
   token: ${BOT_TOKEN}
-#  admin-names: comma-seperated values
+  admin-names: under
   
 # cron parts
-# startSessionCron
-# stopSessionCron
+cron.session.start: 0 0 21 * * WED
+cron.session.stop: 0 0 0 * * THU
 
 spring:
   datasource:
