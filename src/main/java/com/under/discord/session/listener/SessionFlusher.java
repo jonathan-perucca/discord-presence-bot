@@ -4,8 +4,10 @@ import com.under.discord.session.SessionComponent;
 import com.under.discord.session.domain.Session;
 import com.under.discord.session.entity.SessionRecord;
 import com.under.discord.session.event.SessionStopped;
+import com.under.discord.util.MessageTool;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.message.GenericMessageEvent;
+import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -44,9 +46,7 @@ public class SessionFlusher {
                 sessionComponent.save(sessionRecord);
                 
             } catch (DataIntegrityViolationException ex) {
-                event.getChannel()
-                        .sendMessage( format("%s already registered", sessionRecord.getUser()) )
-                        .queue();
+                MessageTool.reply((PrivateMessageReceivedEvent) event, format("%s already registered", sessionRecord.getUser()) );
             }
         }
     }

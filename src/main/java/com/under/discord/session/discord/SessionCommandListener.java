@@ -5,10 +5,12 @@ import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import com.under.discord.config.BotProperties;
 import com.under.discord.session.SessionComponent;
-import com.under.discord.session.domain.SessionRecordStatisticsCSV;
 import com.under.discord.session.domain.SessionRecordStatistic;
+import com.under.discord.session.domain.SessionRecordStatisticsCSV;
 import com.under.discord.session.entity.SessionRecord;
 import com.under.discord.util.Check;
+import com.under.discord.util.MessageTool;
+import com.under.discord.util.Parser;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.entities.PrivateChannel;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
@@ -18,10 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
@@ -51,7 +51,7 @@ public class SessionCommandListener extends ListenerAdapter {
             return;
         }
         if( !Check.isAuthorized(event.getAuthor().getName(), adminNames) ) {
-            this.reply(event, "You're not an admin");
+            MessageTool.reply(event, "You're not an admin");
             return;
         }
 
@@ -59,13 +59,13 @@ public class SessionCommandListener extends ListenerAdapter {
         if( "!session:start".equalsIgnoreCase(content) ) {
             sessionComponent.startSession();
 
-            this.reply(event, "Session started");
+            MessageTool.reply(event, "Session started");
         }
 
         if( "!session:stop".equalsIgnoreCase(content) ) {
             sessionComponent.stopSession(event);
 
-            this.reply(event, "Session stopped");
+            MessageTool.reply(event, "Session stopped");
         }
 
         if( "!session:all".equalsIgnoreCase(content)) {
@@ -76,52 +76,31 @@ public class SessionCommandListener extends ListenerAdapter {
                 sessionRecordTextReport = "No record found";
             }
 
-            this.reply(event, sessionRecordTextReport);
+            MessageTool.reply(event, sessionRecordTextReport);
         }
 
         String sessionFromCommand = "!session:from";
         if( content.startsWith(sessionFromCommand) ) {
-            String singleArgument = content.replace(sessionFromCommand, "").trim();
-
-            Optional<LocalDate> fromDate = parseToLocalDate(singleArgument);
-            if(!fromDate.isPresent()) {
-                String dateFormatErrorMessage = errorMessageDateFormat(singleArgument);
-
-                this.reply(event, dateFormatErrorMessage);
-                return;
-            }
-
-            LocalDate startDate = fromDate.get();
-            this.reply(event, toText( sessionComponent.getSessionRecordsFrom(startDate) ));
+            LocalDate startDate = Parser.parseOptionAsDate(event, sessionFromCommand);
+            if (startDate == null) return;
+            
+            MessageTool.reply(event, toText( sessionComponent.getSessionRecordsFrom(startDate) ));
         }
 
         String readFromCommand = "!session:stats";
         if( content.startsWith(readFromCommand) ) {
-            String singleArgument = content.replace(readFromCommand, "").trim();
-
-            Optional<LocalDate> fromDate = parseToLocalDate(singleArgument);
-            if(!fromDate.isPresent()) {
-                String dateFormatErrorMessage = errorMessageDateFormat(singleArgument);
-
-                this.reply(event, dateFormatErrorMessage);
-                return;
-            }
-
-            LocalDate startDate = fromDate.get();
+            LocalDate startDate = Parser.parseOptionAsDate(event, readFromCommand);
+            if(startDate == null) return;
+            
             List<SessionRecordStatistic> sessionRecordStats = sessionComponent.getSessionRecordStatsFrom(startDate);
             if(sessionRecordStats.isEmpty()) {
-                this.reply(event, format("No session record found for date %s", fromDate.toString()));
+                MessageTool.reply(event, format("No session record found for date %s", startDate.toString()));
                 return;
             }
             
             // TODO : csv as an option
             // this.replyReportAsCsv(event, sessionRecordStats);
         }
-    }
-
-    private void reply(PrivateMessageReceivedEvent event, String sessionRecordTextReport) {
-        PrivateChannel privateChannel = event.getMessage().getPrivateChannel();
-        privateChannel.sendMessage(sessionRecordTextReport).queue();
     }
 
     private void replyReportAsCsv(PrivateMessageReceivedEvent event, List<SessionRecordStatistic> sessionRecordStats) {
@@ -134,7 +113,7 @@ public class SessionCommandListener extends ListenerAdapter {
             String csvWriteErrorMessage = "Could not write CSV file";
 
             logger.error(csvWriteErrorMessage, e);
-            this.reply(event, csvWriteErrorMessage);
+            MessageTool.reply(event, csvWriteErrorMessage);
             return;
         }
 
@@ -157,18 +136,5 @@ public class SessionCommandListener extends ListenerAdapter {
         });
 
         return builder.toString();
-    }
-
-    private Optional<LocalDate> parseToLocalDate(String dateAsString) {
-        try {
-            return Optional.of( LocalDate.parse(dateAsString) );
-        } catch (DateTimeParseException ex) {
-            logger.error(errorMessageDateFormat(dateAsString), ex);
-            return Optional.empty();
-        }
-    }
-
-    private String errorMessageDateFormat(String dateAsString) {
-        return format("Argument %s is not in format YYYY-MM-dd", dateAsString);
     }
 }

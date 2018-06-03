@@ -1,13 +1,14 @@
 package com.under.discord.util;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Check {
-
-    private Check() {}
 
     public static boolean authorIsBot(PrivateMessageReceivedEvent event) {
         return event.getAuthor().isBot();
