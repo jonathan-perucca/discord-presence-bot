@@ -24,10 +24,13 @@ import static java.util.stream.Collectors.toList;
 public class SessionFlusher {
 
     private final SessionComponent sessionComponent;
+    private final MessageTool messageTool;
 
     @Autowired
-    public SessionFlusher(SessionComponent sessionComponent) {
+    public SessionFlusher(SessionComponent sessionComponent, 
+                          MessageTool messageTool) {
         this.sessionComponent = sessionComponent;
+        this.messageTool = messageTool;
     }
 
     @EventListener
@@ -46,7 +49,7 @@ public class SessionFlusher {
                 sessionComponent.save(sessionRecord);
                 
             } catch (DataIntegrityViolationException ex) {
-                MessageTool.reply((PrivateMessageReceivedEvent) event, format("%s already registered", sessionRecord.getUser()) );
+                messageTool.reply((PrivateMessageReceivedEvent) event, format("%s already registered", sessionRecord.getUser()) );
             }
         }
     }

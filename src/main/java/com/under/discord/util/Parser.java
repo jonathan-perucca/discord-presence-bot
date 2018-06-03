@@ -2,9 +2,10 @@ package com.under.discord.util;
 
 import com.under.discord.session.discord.Option;
 import com.under.discord.session.discord.Options;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -14,25 +15,31 @@ import java.util.List;
 import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
-import static lombok.AccessLevel.PRIVATE;
 
 @Slf4j
-@NoArgsConstructor(access = PRIVATE)
+@Component
 public class Parser {
     
-    public static LocalDate parseOptionAsDate(PrivateMessageReceivedEvent event, String content) {
+    private final MessageTool messageTool;
+
+    @Autowired
+    public Parser(MessageTool messageTool) {
+        this.messageTool = messageTool;
+    }
+
+    public LocalDate parseOptionAsDate(PrivateMessageReceivedEvent event, String content) {
         Optional<LocalDate> fromDate = parseToLocalDate(content);
         if(!fromDate.isPresent()) {
             String dateFormatErrorMessage = Error.dateFormatErrorMessage(content);
 
-            MessageTool.reply(event, dateFormatErrorMessage);
+            messageTool.reply(event, dateFormatErrorMessage);
             return null;
         }
 
         return fromDate.get();
     }
 
-    public static Optional<LocalDate> parseToLocalDate(String dateAsString) {
+    public Optional<LocalDate> parseToLocalDate(String dateAsString) {
         try {
             return Optional.of( LocalDate.parse(dateAsString) );
             
@@ -42,7 +49,7 @@ public class Parser {
         }
     }
 
-    public static Options parseOptions(PrivateMessageReceivedEvent event, String content, String command) {
+    public Options parseOptions(PrivateMessageReceivedEvent event, String content, String command) {
         String contentWithoutCommand = content.replace(command, "");
 
         List<String> optionsAndValue = Arrays.stream(contentWithoutCommand.split(" "))
@@ -62,7 +69,7 @@ public class Parser {
         
         Options options = new Options(result);
         if(!options.hasOption()) {
-            MessageTool.reply(event, "Missing date parameter - !session:stats 2018-01-01 for example");
+            messageTool.reply(event, "Missing date parameter - !session:stats 2018-01-01 for example");
         }
         return options;
     }
