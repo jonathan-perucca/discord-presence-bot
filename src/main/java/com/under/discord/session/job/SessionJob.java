@@ -3,6 +3,7 @@ package com.under.discord.session.job;
 import com.under.discord.session.SessionComponent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -16,14 +17,12 @@ public class SessionJob {
         this.sessionComponent = sessionComponent;
     }
 
-    // TODO : set a startSession timing
-//    @Scheduled(initialDelay = 2000)
+    @Scheduled(cron = "${ cron.session.start }")
     public void startSession() {
         sessionComponent.startSession();
     }
 
-    // TODO : set a stopSession timing
-//    @Scheduled(cron = "")
+    @Scheduled(cron = "${ cron.session.stop }")
     public void stopSession() {
         sessionComponent.stopSession(null);
     }

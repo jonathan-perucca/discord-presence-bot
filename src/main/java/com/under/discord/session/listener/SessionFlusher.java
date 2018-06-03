@@ -49,7 +49,9 @@ public class SessionFlusher {
                 sessionComponent.save(sessionRecord);
                 
             } catch (DataIntegrityViolationException ex) {
-                messageTool.reply((PrivateMessageReceivedEvent) event, format("%s already registered", sessionRecord.getUser()) );
+                if(event != null) {
+                    messageTool.reply((PrivateMessageReceivedEvent) event, format("%s already registered", sessionRecord.getUser()) );
+                }
             }
         }
     }

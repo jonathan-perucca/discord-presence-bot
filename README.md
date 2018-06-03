@@ -101,5 +101,3 @@ TODO :
         -Dcron.session.start= * * * * * *
         -Dcron.session.stop= * * * * * *
 ```
-TODO : 
-- parameters for cron.session.(start|stop)
