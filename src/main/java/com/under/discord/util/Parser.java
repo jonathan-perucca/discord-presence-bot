@@ -61,7 +61,7 @@ public class Parser {
         List<Option> result = new ArrayList<>( optionsAndValue.size()/2 );
         for (int i = 0; i < optionsAndValue.size(); i = i+2) {
             String optionPart = optionsAndValue.get(i);
-            String valuePart = optionsAndValue.get(i + 1);
+            String valuePart = i+1 == optionsAndValue.size() ? null : optionsAndValue.get(i + 1);
 
             Option option = new Option(optionPart, valuePart);
             result.add( option );
