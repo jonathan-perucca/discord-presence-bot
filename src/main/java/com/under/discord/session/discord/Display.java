@@ -29,7 +29,7 @@ public class Display {
             );
         });
 
-        return builder.toString();
+        return builder.append(" ").toString();
     }
 
     public String statsToText(List<SessionRecordStatistic> sessionRecordStats) {
@@ -42,6 +42,6 @@ public class Display {
                         .append( SEPARATOR )
         );
 
-        return builder.toString();
+        return builder.append( " " ).toString();
     }
 }

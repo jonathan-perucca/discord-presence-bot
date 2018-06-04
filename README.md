@@ -101,7 +101,7 @@ TODO :
 
 #### Launch bot
 ```bash
-    java -jar discord-presence-bot-0.0.1-SNAPSHOT.jar -Dspring.config.location=<path_to_conf_folder>/
+    java -jar -Dspring.config.location=<path_to_conf_folder>/ discord-presence-bot-0.0.1-SNAPSHOT.jar
 ```
 
 #### Launch configuration file

@@ -80,7 +80,12 @@ public class SessionCommandListener extends ListenerAdapter {
             LocalDate startDate = parser.parseOptionAsDate(event, options.get("from").getValue());
             if (startDate == null) return;
 
-            messageTool.reply(event, display.recordsToText( sessionComponent.getSessionRecordsFrom(startDate) ));
+            List<SessionRecord> sessionRecords = sessionComponent.getSessionRecordsFrom(startDate);
+            if(sessionRecords.isEmpty()) {
+                messageTool.reply(event, "No entry yet");
+            }
+
+            messageTool.reply(event, display.recordsToText(sessionRecords));
         }
 
         String statsCommand = "!session:stats";

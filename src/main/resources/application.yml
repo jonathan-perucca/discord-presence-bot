@@ -3,8 +3,8 @@ bot:
   admin-names: under
   
 # cron parts
-cron.session.start: 0 0 21 * * WED
-cron.session.stop: 0 0 0 * * THU
+cron.session.start: 0 0 21 * * TUE
+cron.session.stop: 0 0 0 * * WED
 
 spring:
   datasource:

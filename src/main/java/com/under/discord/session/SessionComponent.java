@@ -35,6 +35,7 @@ public class SessionComponent {
                             SessionRecordRepository sessionRecordRepository) {
         this.eventPublisher = eventPublisher;
         this.sessionRecordRepository = sessionRecordRepository;
+        this.currentSession = Optional.empty();
     }
 
     @Transactional
@@ -54,12 +55,12 @@ public class SessionComponent {
 
     @Transactional(readOnly = true)
     public List<SessionRecord> getSessionRecordsFrom(LocalDate fromDate) {
-        return sessionRecordRepository.findByStartDateAfter(fromDate);
+        return sessionRecordRepository.findByStartDateEqualOrAfter(fromDate);
     }
     
     @Transactional(readOnly = true)
     public List<SessionRecordStatistic> getSessionRecordStatsFrom(LocalDate fromDate) {
-        List<SessionRecord> sessionRecords = sessionRecordRepository.findByStartDateAfter(fromDate);
+        List<SessionRecord> sessionRecords = sessionRecordRepository.findByStartDateEqualOrAfter(fromDate);
 
         Map<String, Long> presenceMap = sessionRecords.stream()
                 .collect( groupingBy(SessionRecord::getUser, Collectors.counting()) );
