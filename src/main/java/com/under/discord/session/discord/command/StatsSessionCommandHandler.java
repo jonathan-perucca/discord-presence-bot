@@ -1,9 +1,11 @@
-package com.under.discord.session.discord;
+package com.under.discord.session.discord.command;
 
 import com.under.discord.session.SessionComponent;
+import com.under.discord.session.discord.CommandHandler;
+import com.under.discord.session.discord.DiscordTool;
+import com.under.discord.session.discord.tool.Option;
+import com.under.discord.session.discord.tool.Options;
 import com.under.discord.session.domain.SessionRecordStatistic;
-import com.under.discord.util.MessageTool;
-import com.under.discord.util.Parser;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -17,20 +19,14 @@ import static java.lang.String.format;
 public class StatsSessionCommandHandler implements CommandHandler {
 
     private final String COMMAND = "!session:stats";
-    private final Parser parser;
-    private final MessageTool messageTool;
+    private final DiscordTool discordTool;
     private final SessionComponent sessionComponent;
-    private final Display display;
 
     @Autowired
-    public StatsSessionCommandHandler(Parser parser, 
-                                      MessageTool messageTool, 
-                                      SessionComponent sessionComponent, 
-                                      Display display) {
-        this.parser = parser;
-        this.messageTool = messageTool;
+    public StatsSessionCommandHandler(DiscordTool discordTool, 
+                                      SessionComponent sessionComponent) {
+        this.discordTool = discordTool;
         this.sessionComponent = sessionComponent;
-        this.display = display;
     }
 
     @Override
@@ -40,20 +36,22 @@ public class StatsSessionCommandHandler implements CommandHandler {
 
     @Override
     public void apply(PrivateMessageReceivedEvent event) {
-        Options options = parser.parseOptions(event, COMMAND);
-        LocalDate startDate = parser.parseOptionAsDate(event, options.get("from").getValue());
+        Options options = discordTool.parseOptions(event, COMMAND);
+        Option fromOption = options.get("from");
+        if(fromOption == null) return;
+        LocalDate startDate = discordTool.parseOptionAsDate(event, fromOption.getValue());
         if(startDate == null) return;
 
         List<SessionRecordStatistic> sessionRecordStats = sessionComponent.getSessionRecordStatsFrom(startDate);
 
         if(sessionRecordStats.isEmpty()) {
-            messageTool.reply(event, format("No session record found for date %s", startDate.toString()));
+            discordTool.reply(event, format("No session record found for date %s", startDate.toString()));
             return;
         }
         if(options.hasOption("csv")) {
-            messageTool.replyAsCsv(event, sessionRecordStats);
+            discordTool.replyAsCsv(event, sessionRecordStats);
         }
 
-        messageTool.reply(event, display.statsToText(sessionRecordStats));
+        discordTool.reply(event, discordTool.statsToText(sessionRecordStats));
     }
 }

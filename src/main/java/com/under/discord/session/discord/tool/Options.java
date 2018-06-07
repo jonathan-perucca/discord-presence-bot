@@ -1,4 +1,4 @@
-package com.under.discord.session.discord;
+package com.under.discord.session.discord.tool;
 
 import java.util.List;
 
@@ -22,6 +22,6 @@ public class Options {
         return options.stream()
                 .filter(opt -> opt.getOption().equalsIgnoreCase(option))
                 .findAny()
-                .orElseGet( null );
+                .orElse( null );
     }
 }

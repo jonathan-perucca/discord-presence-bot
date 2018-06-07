@@ -4,7 +4,7 @@ import com.under.discord.session.SessionComponent;
 import com.under.discord.session.domain.Session;
 import com.under.discord.session.entity.SessionRecord;
 import com.under.discord.session.event.SessionStopped;
-import com.under.discord.util.MessageTool;
+import com.under.discord.session.discord.tool.MessageTool;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.message.GenericMessageEvent;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;

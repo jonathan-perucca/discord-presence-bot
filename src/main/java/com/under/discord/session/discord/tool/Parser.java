@@ -1,7 +1,5 @@
-package com.under.discord.util;
+package com.under.discord.session.discord.tool;
 
-import com.under.discord.session.discord.Option;
-import com.under.discord.session.discord.Options;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 import org.springframework.beans.factory.annotation.Autowired;

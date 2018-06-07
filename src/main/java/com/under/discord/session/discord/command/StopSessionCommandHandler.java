@@ -1,7 +1,8 @@
-package com.under.discord.session.discord;
+package com.under.discord.session.discord.command;
 
 import com.under.discord.session.SessionComponent;
-import com.under.discord.util.MessageTool;
+import com.under.discord.session.discord.CommandHandler;
+import com.under.discord.session.discord.DiscordTool;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -11,13 +12,13 @@ public class StopSessionCommandHandler implements CommandHandler {
 
     private final String COMMAND = "!session:stop";
     private final SessionComponent sessionComponent;
-    private final MessageTool messageTool;
+    private final DiscordTool discordTool;
 
     @Autowired
     public StopSessionCommandHandler(SessionComponent sessionComponent,
-                                       MessageTool messageTool) {
+                                     DiscordTool discordTool) {
         this.sessionComponent = sessionComponent;
-        this.messageTool = messageTool;
+        this.discordTool = discordTool;
     }
 
     @Override
@@ -29,6 +30,6 @@ public class StopSessionCommandHandler implements CommandHandler {
     public void apply(PrivateMessageReceivedEvent event) {
         sessionComponent.stopSession(event);
 
-        messageTool.reply(event, "Session stopped");
+        discordTool.reply(event, "Session stopped");
     }
 }

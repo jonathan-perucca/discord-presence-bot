@@ -1,4 +1,4 @@
-package com.under.discord.session.discord;
+package com.under.discord.session.discord.tool;
 
 import com.under.discord.session.domain.SessionRecordStatistic;
 import com.under.discord.session.entity.SessionRecord;

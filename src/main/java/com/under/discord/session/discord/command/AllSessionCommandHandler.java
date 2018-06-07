@@ -1,8 +1,9 @@
-package com.under.discord.session.discord;
+package com.under.discord.session.discord.command;
 
 import com.under.discord.session.SessionComponent;
+import com.under.discord.session.discord.CommandHandler;
+import com.under.discord.session.discord.DiscordTool;
 import com.under.discord.session.entity.SessionRecord;
-import com.under.discord.util.MessageTool;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -14,16 +15,13 @@ public class AllSessionCommandHandler implements CommandHandler {
     
     private final String COMMAND = "!session:all";
     private final SessionComponent sessionComponent;
-    private final Display display;
-    private final MessageTool messageTool;
+    private final DiscordTool discordTool;
 
     @Autowired
-    public AllSessionCommandHandler(SessionComponent sessionComponent, 
-                                    Display display, 
-                                    MessageTool messageTool) {
+    public AllSessionCommandHandler(SessionComponent sessionComponent,
+                                    DiscordTool discordTool) {
         this.sessionComponent = sessionComponent;
-        this.display = display;
-        this.messageTool = messageTool;
+        this.discordTool = discordTool;
     }
 
     @Override
@@ -34,12 +32,12 @@ public class AllSessionCommandHandler implements CommandHandler {
     @Override
     public void apply(PrivateMessageReceivedEvent event) {
         List<SessionRecord> sessionRecords = sessionComponent.getAllSessionRecords();
-        String sessionRecordTextReport = display.recordsToText(sessionRecords);
+        String sessionRecordTextReport = discordTool.recordsToText(sessionRecords);
 
         if(sessionRecordTextReport.trim().isEmpty()) {
             sessionRecordTextReport = "No record found";
         }
 
-        messageTool.reply(event, sessionRecordTextReport);
+        discordTool.reply(event, sessionRecordTextReport);
     }
 }
