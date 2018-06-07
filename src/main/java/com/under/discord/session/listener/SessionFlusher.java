@@ -1,10 +1,10 @@
 package com.under.discord.session.listener;
 
 import com.under.discord.session.SessionComponent;
+import com.under.discord.session.discord.DiscordTool;
 import com.under.discord.session.domain.Session;
 import com.under.discord.session.entity.SessionRecord;
 import com.under.discord.session.event.SessionStopped;
-import com.under.discord.session.discord.tool.MessageTool;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.message.GenericMessageEvent;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
@@ -24,13 +24,13 @@ import static java.util.stream.Collectors.toList;
 public class SessionFlusher {
 
     private final SessionComponent sessionComponent;
-    private final MessageTool messageTool;
+    private final DiscordTool discordTool;
 
     @Autowired
-    public SessionFlusher(SessionComponent sessionComponent, 
-                          MessageTool messageTool) {
+    public SessionFlusher(SessionComponent sessionComponent,
+                          DiscordTool discordTool) {
         this.sessionComponent = sessionComponent;
-        this.messageTool = messageTool;
+        this.discordTool = discordTool;
     }
 
     @EventListener
@@ -45,13 +45,20 @@ public class SessionFlusher {
                 .collect(toList());
 
         session.stop();
+        PrivateMessageReceivedEvent receivedEvent = null;
+        if(event != null) {
+            receivedEvent = (PrivateMessageReceivedEvent) event;
+        }
         for (SessionRecord sessionRecord : sessionRecords) {
             try {
+                if( !sessionComponent.isValid(sessionRecord) ) {
+                    discordTool.reply(receivedEvent, format("User %s was not present enough time", sessionRecord.getUser()));
+                }
                 sessionComponent.save(sessionRecord);
-                
+
             } catch (DataIntegrityViolationException ex) {
-                if(event != null) {
-                    messageTool.reply((PrivateMessageReceivedEvent) event, format("%s already registered", sessionRecord.getUser()) );
+                if(receivedEvent != null) {
+                    discordTool.reply(receivedEvent, format("%s already registered", sessionRecord.getUser()) );
                 }
             }
         }

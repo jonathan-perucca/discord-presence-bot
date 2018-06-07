@@ -22,4 +22,10 @@ public class BotProperties {
      * Admin nickname list
      */
     private List<String> adminNames = emptyList();
+
+    /**
+     * Minimum amount of time (in seconds) needed 
+     * per user in order to have a validated session presence
+     */
+    private Long sessionTimeSeconds;
 }

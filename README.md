@@ -106,8 +106,9 @@ TODO :
 
 ###### application.properties
 ```
-    BOT_TOKEN=...
-    bot.admin-names=... // comma-seperated values
+    BOT_TOKEN=... // your bot token
+    bot.admin-names=... // comma-seperated values - discord user nicknames authorized to query the bot
+    bot.session-time-seconds=1200 // minimal amount of seconds needed per user for validating a session
     cron.session.start=0 0 21 * * WED
     cron.session.stop=0 0 0 * * THU
 ```

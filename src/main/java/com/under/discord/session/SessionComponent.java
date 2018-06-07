@@ -1,5 +1,6 @@
 package com.under.discord.session;
 
+import com.under.discord.config.BotProperties;
 import com.under.discord.session.domain.Session;
 import com.under.discord.session.domain.SessionRecordStatistic;
 import com.under.discord.session.entity.SessionRecord;
@@ -28,13 +29,16 @@ public class SessionComponent {
     private static final Logger logger = getLogger(SessionComponent.class);
     private final ApplicationEventPublisher eventPublisher;
     private final SessionRecordRepository sessionRecordRepository;
+    private final BotProperties botProperties;
     private Optional<Session> currentSession;
 
     @Autowired
     public SessionComponent(ApplicationEventPublisher eventPublisher,
-                            SessionRecordRepository sessionRecordRepository) {
+                            SessionRecordRepository sessionRecordRepository, 
+                            BotProperties botProperties) {
         this.eventPublisher = eventPublisher;
         this.sessionRecordRepository = sessionRecordRepository;
+        this.botProperties = botProperties;
         this.currentSession = Optional.empty();
     }
 
@@ -108,5 +112,9 @@ public class SessionComponent {
 
     public Optional<Session> getCurrentSession() {
         return currentSession;
+    }
+
+    public boolean isValid(SessionRecord sessionRecord) {
+        return botProperties.getSessionTimeSeconds() <= sessionRecord.getTimeSpentInSeconds();
     }
 }
