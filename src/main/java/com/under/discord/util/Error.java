@@ -9,6 +9,6 @@ import static java.lang.String.format;
 public final class Error {
     
     public static String dateFormatErrorMessage(String dateAsString) {
-        return format("Argument %s is not in format YYYY-MM-dd", dateAsString);
+        return format("Argument %s is not in format yyyy-MM-dd", dateAsString);
     }
 }

@@ -49,7 +49,8 @@ public class Parser {
         }
     }
 
-    public Options parseOptions(PrivateMessageReceivedEvent event, String content, String command) {
+    public Options parseOptions(PrivateMessageReceivedEvent event, String command) {
+        String content = event.getMessage().getContent();
         String contentWithoutCommand = content.replace(command, "");
 
         List<String> optionsAndValue = Arrays.stream(contentWithoutCommand.split(" "))
@@ -69,7 +70,7 @@ public class Parser {
         
         Options options = new Options(result);
         if(!options.hasOption()) {
-            messageTool.reply(event, "Missing date parameter - !session:stats 2018-01-01 for example");
+            messageTool.reply(event, "Missing date parameter - !session:stats from 2018-01-01 for example");
         }
         return options;
     }
