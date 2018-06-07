@@ -85,10 +85,8 @@ session_date :
 
 #### Helper command
 ```
-    !help
+    !session:help
 ```
-TODO :
-- command implementation
 
 # Install
 

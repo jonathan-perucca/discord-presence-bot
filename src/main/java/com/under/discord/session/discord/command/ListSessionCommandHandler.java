@@ -44,4 +44,11 @@ public class ListSessionCommandHandler implements CommandHandler {
 
         discordTool.reply(event, discordTool.recordsToText(sessionRecords));
     }
+
+    @Override
+    public String help() {
+        return "`!session:list from <from_date>` - Presence list of every users of every sessions since 'from_date' \n" +
+                "\texample: !session:list from 2018-01-01 \n" +
+                "\tmandatory: from_date";
+    }
 }

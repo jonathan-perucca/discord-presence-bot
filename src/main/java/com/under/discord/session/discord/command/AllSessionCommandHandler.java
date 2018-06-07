@@ -40,4 +40,9 @@ public class AllSessionCommandHandler implements CommandHandler {
 
         discordTool.reply(event, sessionRecordTextReport);
     }
+
+    @Override
+    public String help() {
+        return "`!session:all` - All presence list sessions";
+    }
 }

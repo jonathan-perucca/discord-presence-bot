@@ -32,4 +32,9 @@ public class StopSessionCommandHandler implements CommandHandler {
 
         discordTool.reply(event, "Session stopped");
     }
+
+    @Override
+    public String help() {
+        return "`!session:stop` - Stop a session";
+    }
 }

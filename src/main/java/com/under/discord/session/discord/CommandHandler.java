@@ -7,4 +7,6 @@ public interface CommandHandler {
     boolean supports(PrivateMessageReceivedEvent event);
 
     void apply(PrivateMessageReceivedEvent event);
+    
+    String help();
 }

@@ -55,4 +55,12 @@ public class StatsSessionCommandHandler implements CommandHandler {
 
         discordTool.reply(event, discordTool.statsToText(sessionRecordStats));
     }
+
+    @Override
+    public String help() {
+        return "`!session:stats from <from_date> (csv)` - Presence statistics of every users of every sessions since 'from_date' \n" +
+                "\texample: !session:stats from 2018-01-01 or !session:stats from 2018-01-01 csv \n" +
+                "\tmandatory: from_date \n" +
+                "\toptional: csv";
+    }
 }

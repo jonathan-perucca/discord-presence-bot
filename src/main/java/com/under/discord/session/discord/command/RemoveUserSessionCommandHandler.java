@@ -50,4 +50,11 @@ public class RemoveUserSessionCommandHandler implements CommandHandler {
         }
         discordTool.reply(event, format("%s was removed for session on %s", username, onDate));
     }
+
+    @Override
+    public String help() {
+        return "`!session:remove user <user_name> on <session_date> (csv)` - Remove a user presence of a specific session \n" +
+                "\texample: !session:remove user under on 2018-02-10 \n" +
+                "\tmandatory: user_name, session_date";
+    }
 }
