@@ -13,4 +13,6 @@ public interface SessionRecordRepository extends JpaRepository<SessionRecord, Lo
 
     @Query("select sr from SessionRecord sr where startDate >= :start_date")
     List<SessionRecord> findByStartDateEqualOrAfter(@Param("start_date") LocalDate fromDate);
+    
+    SessionRecord findByUserAndStartDate(String username, LocalDate startDate);
 }

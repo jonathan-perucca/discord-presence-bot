@@ -37,8 +37,9 @@ public class StatsSessionCommandHandler implements CommandHandler {
     @Override
     public void apply(PrivateMessageReceivedEvent event) {
         Options options = discordTool.parseOptions(event, COMMAND);
+        if(!options.hasOption("from")) return;
+        
         Option fromOption = options.get("from");
-        if(fromOption == null) return;
         LocalDate startDate = discordTool.parseOptionAsDate(event, fromOption.getValue());
         if(startDate == null) return;
 

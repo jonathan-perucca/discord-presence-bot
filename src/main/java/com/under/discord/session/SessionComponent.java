@@ -96,6 +96,16 @@ public class SessionComponent {
         this.currentSession = Optional.empty();
     }
 
+    public boolean remove(String username, LocalDate onDate) {
+        SessionRecord sessionRecord = sessionRecordRepository.findByUserAndStartDate(username, onDate);
+        if(sessionRecord == null) {
+            return false;
+        }
+        
+        sessionRecordRepository.delete(sessionRecord);
+        return true;
+    }
+
     public Optional<Session> getCurrentSession() {
         return currentSession;
     }

@@ -66,8 +66,6 @@ from_date
 ```bash
     !session:remove user <user_name> on <session_date>
 ```
-TODO :
-- command implementation
 
 #### !session:remove -- examples
 
