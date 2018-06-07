@@ -27,4 +27,7 @@ public class SessionRecord {
 
     @Column(name = "user")
     private String user;
+    
+    @Column(name = "time_spent_seconds")
+    private Long timeSpentInSeconds;
 }

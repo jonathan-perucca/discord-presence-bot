@@ -41,9 +41,10 @@ public class SessionFlusher {
         Set<User> userJoins = session.getUserJoins();
 
         List<SessionRecord> sessionRecords = userJoins.stream()
-                .map(user -> newSessionRecord(startDate, user))
+                .map(user -> newSessionRecord(startDate, user, session.getSessionTimeFor(user.getName())))
                 .collect(toList());
 
+        session.stop();
         for (SessionRecord sessionRecord : sessionRecords) {
             try {
                 sessionComponent.save(sessionRecord);
@@ -56,10 +57,11 @@ public class SessionFlusher {
         }
     }
 
-    private SessionRecord newSessionRecord(LocalDate startDate, User user) {
+    private SessionRecord newSessionRecord(LocalDate startDate, User user, Long timeSpentInSeconds) {
         return SessionRecord.builder()
                 .startDate(startDate)
                 .user(user.getName())
+                .timeSpentInSeconds(timeSpentInSeconds)
                 .build();
     }
 }

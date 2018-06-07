@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
+import static java.lang.String.format;
 import static java.util.stream.Collectors.groupingBy;
 
 @Component
@@ -24,12 +25,26 @@ public class Display {
         recordsByDate.forEach((sessionDate, sessionRecordsEntry) -> {
 
             builder.append( "Session of " ).append( sessionDate ).append( SEPARATOR );
-            sessionRecordsEntry.forEach(sessionRecord ->
-                    builder.append( sessionRecord.getUser() ).append( SEPARATOR )
-            );
+            sessionRecordsEntry.forEach(sessionRecord -> {
+                String timeSpentHumanReadable = getTimeSpentReadable(sessionRecord);
+
+                builder.append( sessionRecord.getUser() )
+                        .append( " - " )
+                        .append( timeSpentHumanReadable )
+                        .append( SEPARATOR );
+            });
         });
 
         return builder.append(" ").toString();
+    }
+
+    private String getTimeSpentReadable(SessionRecord sessionRecord) {
+        Long timeSpentInSeconds = sessionRecord.getTimeSpentInSeconds();
+        return format("%d Heures - %02d minutes - %02d seconds", 
+                timeSpentInSeconds / 3600, 
+                (timeSpentInSeconds % 3600) / 60, 
+                (timeSpentInSeconds % 60)
+        );
     }
 
     public String statsToText(List<SessionRecordStatistic> sessionRecordStats) {
