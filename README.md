@@ -90,6 +90,10 @@ session_date :
 
 # Install
 
+### Create a discord bot
+
+Follow this tutorial : [How to register a discord bot](https://github.com/reactiflux/discord-irc/wiki/Creating-a-discord-bot-&-getting-a-token)
+
 ### Package from source
 ```bash 
     mvn package
