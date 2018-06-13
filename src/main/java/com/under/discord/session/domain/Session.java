@@ -1,13 +1,13 @@
 package com.under.discord.session.domain;
 
-import lombok.Builder;
 import lombok.Getter;
 import net.dv8tion.jda.core.entities.User;
 
-import java.time.Duration;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import static com.under.discord.session.domain.VoiceChannelEvent.ENTER;
 import static com.under.discord.session.domain.VoiceChannelEvent.LEAVE;
@@ -26,12 +26,10 @@ public class Session {
     }
 
     public void declarePresence(User user) {
-        this.userJoins.add(user);
-
         String username = user.getName();
-        if (!userTimeTrackers.containsKey(username)) {
-            userTimeTrackers.put(username, new TimeTracker());
-        }
+
+        userJoins.add(user);
+        userTimeTrackers.putIfAbsent(username, new TimeTracker());
 
         TimeTracker timeTracker = userTimeTrackers.get(username);
         timeTracker.addTrackingEvent(ENTER, now());
@@ -53,11 +51,9 @@ public class Session {
     }
 
     public Long getSessionTimeFor(String username) {
-        if (!userTimeTrackers.containsKey(username)) {
-            return 0L;
-        }
-
-        return userTimeTrackers.get(username).getTotalTimeSeconds();
+        return userTimeTrackers
+                .getOrDefault(username, new TimeTracker())
+                .getTotalTimeSeconds();
     }
 }
 

@@ -45,10 +45,7 @@ public class SessionFlusher {
                 .collect(toList());
 
         session.stop();
-        PrivateMessageReceivedEvent receivedEvent = null;
-        if(event != null) {
-            receivedEvent = (PrivateMessageReceivedEvent) event;
-        }
+        PrivateMessageReceivedEvent receivedEvent = ( event != null ) ? PrivateMessageReceivedEvent.class.cast( event ) : null;
         for (SessionRecord sessionRecord : sessionRecords) {
             try {
                 if( !sessionComponent.isValid(sessionRecord) ) {

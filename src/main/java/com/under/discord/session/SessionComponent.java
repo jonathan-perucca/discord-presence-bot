@@ -64,20 +64,19 @@ public class SessionComponent {
     
     @Transactional(readOnly = true)
     public List<SessionRecordStatistic> getSessionRecordStatsFrom(LocalDate fromDate) {
-        List<SessionRecord> sessionRecords = sessionRecordRepository.findByStartDateEqualOrAfter(fromDate);
-
-        Map<String, Long> presenceMap = sessionRecords.stream()
-                .collect( groupingBy(SessionRecord::getUser, Collectors.counting()) );
-
-        return presenceMap.entrySet().stream()
+        return sessionRecordRepository.findByStartDateEqualOrAfter(fromDate)
+                .stream()
+                .collect( groupingBy(SessionRecord::getUser, Collectors.counting()) )
+                .entrySet()
+                .stream()
                 .map(this::toStatistic)
                 .collect(toList());
     }
     
     private SessionRecordStatistic toStatistic(Map.Entry<String, Long> entry) {
         return SessionRecordStatistic.builder()
-                .user(entry.getKey())
-                .presenceTimes(String.valueOf(entry.getValue()))
+                .user( entry.getKey() )
+                .presenceTimes( String.valueOf(entry.getValue()) )
                 .build();
     }
 
@@ -85,9 +84,7 @@ public class SessionComponent {
         LocalDate startDate = LocalDate.now();
         logger.info("New session started at {}", startDate);
 
-        this.currentSession = Optional.of( new Session(startDate) );
-
-        return this.currentSession.get();
+        return ( this.currentSession = Optional.of(new Session(startDate)) ).get();
     }
 
     public void stopSession(GenericMessageEvent event) {

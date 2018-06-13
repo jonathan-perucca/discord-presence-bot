@@ -16,7 +16,7 @@ public class HelpCommandHandler implements CommandHandler {
     private final List<CommandHandler> commandHandlers;
 
     @Autowired
-    public HelpCommandHandler(DiscordTool discordTool, 
+    public HelpCommandHandler(DiscordTool discordTool,
                               List<CommandHandler> commandHandlers) {
         this.discordTool = discordTool;
         this.commandHandlers = commandHandlers;
@@ -30,9 +30,12 @@ public class HelpCommandHandler implements CommandHandler {
     @Override
     public void apply(PrivateMessageReceivedEvent event) {
         StringBuilder help = new StringBuilder();
-        help.append( "Manual \n" );
-        commandHandlers.forEach(commandHandler -> 
-                help.append( commandHandler.help() ).append( "\n" )
+        help.append( "Manual" ).append( System.lineSeparator() );
+        commandHandlers.forEach(commandHandler ->
+                help.append( commandHandler.help() )
+                        .append( System.lineSeparator() )
+                        .append( "----------------------------------------" )
+                        .append( System.lineSeparator() )
         );
         discordTool.reply(event, help.toString());
     }
