@@ -3,6 +3,7 @@ package com.under.discord.session;
 import com.under.discord.config.BotProperties;
 import com.under.discord.session.domain.Session;
 import com.under.discord.session.domain.SessionRecordStatistic;
+import com.under.discord.session.domain.SessionTimer;
 import com.under.discord.session.entity.SessionRecord;
 import com.under.discord.session.entity.SessionRecordRepository;
 import com.under.discord.session.event.SessionStopped;
@@ -84,7 +85,7 @@ public class SessionComponent {
         LocalDate startDate = LocalDate.now();
         logger.info("New session started at {}", startDate);
 
-        return ( this.currentSession = Optional.of(new Session(startDate)) ).get();
+        return ( this.currentSession = Optional.of(new Session(startDate, new SessionTimer())) ).get();
     }
 
     public void stopSession(GenericMessageEvent event) {
