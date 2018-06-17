@@ -45,6 +45,6 @@ public class MessageTool {
         }
 
         PrivateChannel privateChannel = event.getMessage().getPrivateChannel();
-        privateChannel.sendFile(recordsAsCSV.getBytes(), "report.txt", new MessageBuilder().append("Report done").build()).queue();
+        privateChannel.sendFile(recordsAsCSV.getBytes(), "report.csv", new MessageBuilder().append("Report done").build()).queue();
     }
 }
