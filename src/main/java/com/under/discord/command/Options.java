@@ -1,4 +1,4 @@
-package com.under.discord.session.discord.tool;
+package com.under.discord.command;
 
 import java.util.List;
 

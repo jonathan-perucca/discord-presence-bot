@@ -1,10 +1,12 @@
 package com.under.discord.session.discord.command;
 
+import com.under.discord.command.Command;
+import com.under.discord.command.Help;
 import com.under.discord.session.SessionComponent;
-import com.under.discord.session.discord.CommandHandler;
 import com.under.discord.session.discord.DiscordTool;
-import com.under.discord.session.discord.tool.Option;
-import com.under.discord.session.discord.tool.Options;
+import com.under.discord.session.discord.tool.Error;
+import com.under.discord.command.Option;
+import com.under.discord.command.Options;
 import com.under.discord.session.domain.SessionRecordStatistic;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,37 +14,50 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import static java.lang.String.format;
 
 @Component
-public class StatsSessionCommandHandler implements CommandHandler {
+public class StatsSessionCommandHandler extends PrivateMessageCommandHandler {
 
-    private final String COMMAND = "!session:stats";
     private final DiscordTool discordTool;
     private final SessionComponent sessionComponent;
 
     @Autowired
-    public StatsSessionCommandHandler(DiscordTool discordTool, 
+    public StatsSessionCommandHandler(DiscordTool discordTool,
                                       SessionComponent sessionComponent) {
+        super(
+                Command.builder("!session:stats")
+                        .helper(
+                                Help.builder("!session:stats")
+                                        .description("Presence statistics of every users of every sessions since 'from_date'")
+                                        .example("!session:stats from 2018-01-01 or !session:stats from 2018-01-01 csv")
+                                        .addOption( new Option("from").required(true) )
+                                        .addOption( new Option("csv").required(false) )
+                        )
+                        .build()
+        );
         this.discordTool = discordTool;
         this.sessionComponent = sessionComponent;
     }
 
     @Override
-    public boolean supports(PrivateMessageReceivedEvent event) {
-        return event.getMessage().getContent().startsWith(COMMAND);
-    }
-
-    @Override
     public void apply(PrivateMessageReceivedEvent event) {
-        Options options = discordTool.parseOptions(event, COMMAND);
-        if(!options.hasOption("from")) return;
-        
+        Options options = command.parse( event.getMessage().getContent() );
+        if( !options.hasOption() ) {
+            discordTool.reply(event, "Missing date parameter - !session:stats from 2018-01-01 for example");
+        }
+        if( !options.hasOption("from") ) return;
         Option fromOption = options.get("from");
-        LocalDate startDate = discordTool.parseOptionAsDate(event, fromOption.getValue());
-        if(startDate == null) return;
-
+        Optional<LocalDate> optionalStartDate = fromOption.getValueAsLocalDate();
+        if(!optionalStartDate.isPresent()) {
+            String errorMessage = Error.dateFormatErrorMessage( fromOption.getValue() );
+            discordTool.reply(event, errorMessage);
+            return;
+        }
+        
+        LocalDate startDate = optionalStartDate.get();
         List<SessionRecordStatistic> sessionRecordStats = sessionComponent.getSessionRecordStatsFrom(startDate);
 
         if(sessionRecordStats.isEmpty()) {
@@ -54,13 +69,5 @@ public class StatsSessionCommandHandler implements CommandHandler {
         }
 
         discordTool.reply(event, discordTool.statsToText(sessionRecordStats));
-    }
-
-    @Override
-    public String help() {
-        return "`!session:stats from <from_date> (csv)` - Presence statistics of every users of every sessions since 'from_date' \n" +
-                "\texample: !session:stats from 2018-01-01 or !session:stats from 2018-01-01 csv \n" +
-                "\tmandatory: from_date \n" +
-                "\toptional: csv";
     }
 }

@@ -1,29 +1,29 @@
 package com.under.discord.session.discord.command;
 
+import com.under.discord.command.Command;
+import com.under.discord.command.Help;
 import com.under.discord.session.SessionComponent;
-import com.under.discord.session.discord.CommandHandler;
 import com.under.discord.session.discord.DiscordTool;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class StartSessionCommandHandler implements CommandHandler {
+public class StartSessionCommandHandler extends PrivateMessageCommandHandler {
 
-    private final String COMMAND = "!session:start";
     private final SessionComponent sessionComponent;
     private final DiscordTool discordTool;
 
     @Autowired
     public StartSessionCommandHandler(SessionComponent sessionComponent,
                                       DiscordTool discordTool) {
+        super(
+                Command.builder("!session:start")
+                        .helper( Help.builder("!session:start").description("Start a session") )
+                        .build()
+        );
         this.sessionComponent = sessionComponent;
         this.discordTool = discordTool;
-    }
-
-    @Override
-    public boolean supports(PrivateMessageReceivedEvent event) {
-        return event.getMessage().getContent().startsWith(COMMAND);
     }
 
     @Override
@@ -31,10 +31,5 @@ public class StartSessionCommandHandler implements CommandHandler {
         sessionComponent.startSession();
 
         discordTool.reply(event, "Session started");
-    }
-
-    @Override
-    public String help() {
-        return "`!session:start` - Start a session";
     }
 }
