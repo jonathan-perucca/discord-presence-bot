@@ -29,13 +29,14 @@ public class StatsSessionCommandHandler extends PrivateMessageCommandHandler {
                                       SessionComponent sessionComponent) {
         super(
                 Command.builder("!session:stats")
-                        .helper(
-                                Help.builder("!session:stats")
-                                        .description("Presence statistics of every users of every sessions since 'from_date'")
-                                        .example("!session:stats from 2018-01-01 or !session:stats from 2018-01-01 csv")
-                                        .addOption( new Option("from").required(true) )
-                                        .addOption( new Option("csv").required(false) )
-                        )
+                        .addOption( new Option("from").required(true) )
+                        .addOption( new Option("csv").required(false) )
+                        .build(),
+                discordTool);
+        this.command.setHelp(
+                Help.builder(command)
+                        .description("Presence statistics of every users of every sessions since 'from_date'")
+                        .example("!session:stats from 2018-01-01 or !session:stats from 2018-01-01 csv")
                         .build()
         );
         this.discordTool = discordTool;
@@ -45,10 +46,6 @@ public class StatsSessionCommandHandler extends PrivateMessageCommandHandler {
     @Override
     public void apply(PrivateMessageReceivedEvent event) {
         Options options = command.parse( event.getMessage().getContent() );
-        if( !options.hasOption() ) {
-            discordTool.reply(event, "Missing date parameter - !session:stats from 2018-01-01 for example");
-        }
-        if( !options.hasOption("from") ) return;
         Option fromOption = options.get("from");
         Optional<LocalDate> optionalStartDate = fromOption.getValueAsLocalDate();
         if(!optionalStartDate.isPresent()) {
@@ -56,7 +53,7 @@ public class StatsSessionCommandHandler extends PrivateMessageCommandHandler {
             discordTool.reply(event, errorMessage);
             return;
         }
-        
+
         LocalDate startDate = optionalStartDate.get();
         List<SessionRecordStatistic> sessionRecordStats = sessionComponent.getSessionRecordStatsFrom(startDate);
 

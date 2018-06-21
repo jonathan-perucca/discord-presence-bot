@@ -20,11 +20,8 @@ public class AllSessionCommandHandler extends PrivateMessageCommandHandler {
     @Autowired
     public AllSessionCommandHandler(SessionComponent sessionComponent,
                                     DiscordTool discordTool) {
-        super(
-                Command.builder("!session:all")
-                        .helper( Help.builder("!session:all").description("All presence list sessions") )
-                        .build()
-        );
+        super(Command.builder("!session:all").build(), discordTool);
+        this.command.setHelp( Help.builder(command).description("All presence list sessions").build() );
         this.sessionComponent = sessionComponent;
         this.discordTool = discordTool;
     }

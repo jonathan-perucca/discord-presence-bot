@@ -18,7 +18,7 @@ public class HelpCommandHandler extends PrivateMessageCommandHandler {
     @Autowired
     public HelpCommandHandler(DiscordTool discordTool,
                               List<CommandHandler> commandHandlers) {
-        super( Command.builder("!session:help").build() );
+        super( Command.builder("!session:help").build(), discordTool);
         this.discordTool = discordTool;
         this.commandHandlers = commandHandlers;
     }
@@ -27,12 +27,16 @@ public class HelpCommandHandler extends PrivateMessageCommandHandler {
     public void apply(PrivateMessageReceivedEvent event) {
         StringBuilder help = new StringBuilder();
         help.append( "Manual" ).append( System.lineSeparator() );
-        commandHandlers.forEach(commandHandler ->
-                help.append( commandHandler.help() )
-                        .append( System.lineSeparator() )
-                        .append( "----------------------------------------" )
-                        .append( System.lineSeparator() )
-        );
+        for (int i = 0; i < commandHandlers.size(); i++) {
+            CommandHandler commandHandler = commandHandlers.get(i);
+
+            help.append( commandHandler.help() )
+                .append( System.lineSeparator() );
+            if(i < commandHandlers.size() - 1) {
+                help.append( "----------------------------------------" )
+                    .append( System.lineSeparator() );
+            }
+        }
         discordTool.reply(event, help.toString());
     }
 }

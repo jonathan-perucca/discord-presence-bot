@@ -17,11 +17,8 @@ public class StopSessionCommandHandler extends PrivateMessageCommandHandler {
     @Autowired
     public StopSessionCommandHandler(SessionComponent sessionComponent,
                                      DiscordTool discordTool) {
-        super(
-                Command.builder("!session:stop")
-                        .helper( Help.builder("!session:stop").description("Stop a session") )
-                        .build()
-        );
+        super( Command.builder("!session:stop").build(), discordTool);
+        this.command.setHelp( Help.builder(command).description("Stop a session").build() );
         this.sessionComponent = sessionComponent;
         this.discordTool = discordTool;
     }

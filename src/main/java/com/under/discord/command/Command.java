@@ -1,14 +1,20 @@
 package com.under.discord.command;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Command {
 
+    final List<Option> mandatories;
+    final List<Option> optionals;
+    final String command;
     private final Parser parser;
-    private final String command;
-    private final String help;
+    private Help help;
 
     public Command(CommandBuilder builder) {
         this.command = builder.command;
-        this.help = builder.helper;
+        this.mandatories = builder.mandatories;
+        this.optionals = builder.optionals;
         this.parser = new Parser();
     }
 
@@ -23,21 +29,38 @@ public class Command {
     public boolean validate(String content) {
         return content.startsWith(command);
     }
+    
+    public boolean validateOptions(String commandline) {
+        return mandatories.stream()
+                .map(Option::getOption)
+                .allMatch(commandline::contains);
+    }
 
-    public String help() {
-        return help;
+    public String getHelp() {
+        return (help != null) ? help.toString() : "";
+    }
+
+    public void setHelp(Help help) {
+        this.help = help;
     }
 
     public static class CommandBuilder {
         private final String command;
-        private String helper = "";
+        private final List<Option> mandatories;
+        private final List<Option> optionals;
 
         public CommandBuilder(String command) {
             this.command = command;
+            this.mandatories = new ArrayList<>();
+            this.optionals = new ArrayList<>();
         }
 
-        public CommandBuilder helper(Help.HelpBuilder helpBuilder) {
-            this.helper = helpBuilder.build().toString();
+        public CommandBuilder addOption(Option option) {
+            if(option.isRequired()) {
+                mandatories.add( option );
+            } else {
+                optionals.add( option );
+            }
             return this;
         }
 

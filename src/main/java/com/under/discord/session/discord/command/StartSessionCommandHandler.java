@@ -17,11 +17,8 @@ public class StartSessionCommandHandler extends PrivateMessageCommandHandler {
     @Autowired
     public StartSessionCommandHandler(SessionComponent sessionComponent,
                                       DiscordTool discordTool) {
-        super(
-                Command.builder("!session:start")
-                        .helper( Help.builder("!session:start").description("Start a session") )
-                        .build()
-        );
+        super( Command.builder("!session:start").build(), discordTool);
+        this.command.setHelp( Help.builder(command).description("Start a session").build() );
         this.sessionComponent = sessionComponent;
         this.discordTool = discordTool;
     }

@@ -6,6 +6,7 @@ import com.under.discord.session.SessionComponent;
 import com.under.discord.session.discord.DiscordTool;
 import com.under.discord.command.Option;
 import com.under.discord.command.Options;
+import com.under.discord.session.discord.tool.Error;
 import com.under.discord.session.entity.SessionRecord;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,21 +19,23 @@ import java.util.Optional;
 @Component
 public class ListSessionCommandHandler extends PrivateMessageCommandHandler {
     
+    private static final String fromOptionName = "from";
     private final SessionComponent sessionComponent;
     private final DiscordTool discordTool;
 
     @Autowired
     public ListSessionCommandHandler(SessionComponent sessionComponent,
                                      DiscordTool discordTool) {
-        super(
+        super( 
                 Command.builder("!session:list")
-                        .helper(
-                                Help.builder("!session:list from <from_date>")
-                                        .description("Presence list of every users of every sessions since 'from_date'")
-                                        .example("!session:list from 2018-01-01")
-                                        .addOption( new Option("from").required(true) )
-                        )
-                        .build()
+                        .addOption( new Option(fromOptionName).required(true) )
+                        .build(),
+                discordTool);
+        this.command.setHelp(
+                Help.builder(command)
+                .description("Presence list of every users of every sessions since 'from_date'")
+                .example("!session:list from 2018-01-01")
+                .build()
         );
         this.discordTool = discordTool;
         this.sessionComponent = sessionComponent;
@@ -40,14 +43,21 @@ public class ListSessionCommandHandler extends PrivateMessageCommandHandler {
 
     @Override
     public void apply(PrivateMessageReceivedEvent event) {
+        // TODO : give a hint into command builder to specify an option type validator
+        // TODO : make this option type validator
         Options options = command.parse( event.getMessage().getContent() );
-        Option fromOption = options.get("from");
+        Option fromOption = options.get(fromOptionName);
         Optional<LocalDate> optionalStartDate = fromOption.getValueAsLocalDate();
-        if( !optionalStartDate.isPresent() ) return;
+        if( !optionalStartDate.isPresent() ) {
+            String errorMessage = Error.dateFormatErrorMessage( fromOption.getValue()  );
+            discordTool.reply(event, errorMessage);
+            return;
+        }
+        
         LocalDate startDate = optionalStartDate.get();
 
         List<SessionRecord> sessionRecords = sessionComponent.getSessionRecordsFrom(startDate);
-        if(sessionRecords.isEmpty()) {
+        if( sessionRecords.isEmpty() ) {
             discordTool.reply(event, "No entry yet");
         }
 

@@ -1,7 +1,6 @@
 package com.under.discord.command;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,8 +9,7 @@ import java.util.List;
 import static java.util.stream.Collectors.toList;
 
 @Slf4j
-@Component
-public class Parser {
+class Parser {
     
     public Options parseOptions(String content, String command) {
         String contentWithoutCommand = content.replace(command, "");
