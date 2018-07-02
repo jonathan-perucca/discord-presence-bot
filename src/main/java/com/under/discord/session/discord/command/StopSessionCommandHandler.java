@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 public class StopSessionCommandHandler extends PrivateMessageCommandHandler {
 
     private final SessionComponent sessionComponent;
-    private final DiscordTool discordTool;
 
     @Autowired
     public StopSessionCommandHandler(SessionComponent sessionComponent,
@@ -20,7 +19,6 @@ public class StopSessionCommandHandler extends PrivateMessageCommandHandler {
         super( Command.builder("!session:stop").build(), discordTool);
         this.command.setHelp( Help.builder(command).description("Stop a session").build() );
         this.sessionComponent = sessionComponent;
-        this.discordTool = discordTool;
     }
 
     @Override

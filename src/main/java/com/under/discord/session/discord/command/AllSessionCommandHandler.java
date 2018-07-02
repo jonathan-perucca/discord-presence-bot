@@ -15,7 +15,6 @@ import java.util.List;
 public class AllSessionCommandHandler extends PrivateMessageCommandHandler {
     
     private final SessionComponent sessionComponent;
-    private final DiscordTool discordTool;
 
     @Autowired
     public AllSessionCommandHandler(SessionComponent sessionComponent,
@@ -23,7 +22,6 @@ public class AllSessionCommandHandler extends PrivateMessageCommandHandler {
         super(Command.builder("!session:all").build(), discordTool);
         this.command.setHelp( Help.builder(command).description("All presence list sessions").build() );
         this.sessionComponent = sessionComponent;
-        this.discordTool = discordTool;
     }
 
     @Override

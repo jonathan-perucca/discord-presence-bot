@@ -21,7 +21,6 @@ import static java.lang.String.format;
 @Component
 public class StatsSessionCommandHandler extends PrivateMessageCommandHandler {
 
-    private final DiscordTool discordTool;
     private final SessionComponent sessionComponent;
 
     @Autowired
@@ -39,7 +38,6 @@ public class StatsSessionCommandHandler extends PrivateMessageCommandHandler {
                         .example("!session:stats from 2018-01-01 or !session:stats from 2018-01-01 csv")
                         .build()
         );
-        this.discordTool = discordTool;
         this.sessionComponent = sessionComponent;
     }
 

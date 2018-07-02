@@ -20,7 +20,6 @@ import static java.lang.String.format;
 public class RemoveUserSessionCommandHandler extends PrivateMessageCommandHandler {
 
     private final SessionComponent sessionComponent;
-    private final DiscordTool discordTool;
 
     @Autowired
     public RemoveUserSessionCommandHandler(SessionComponent sessionComponent,
@@ -38,7 +37,6 @@ public class RemoveUserSessionCommandHandler extends PrivateMessageCommandHandle
                         .build()
         );
         this.sessionComponent = sessionComponent;
-        this.discordTool = discordTool;
     }
 
     @Override

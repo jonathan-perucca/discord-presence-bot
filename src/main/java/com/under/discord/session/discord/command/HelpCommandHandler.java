@@ -12,14 +12,12 @@ import java.util.List;
 @Component
 public class HelpCommandHandler extends PrivateMessageCommandHandler {
 
-    private final DiscordTool discordTool;
     private final List<CommandHandler> commandHandlers;
     
     @Autowired
     public HelpCommandHandler(DiscordTool discordTool,
                               List<CommandHandler> commandHandlers) {
         super( Command.builder("!session:help").build(), discordTool);
-        this.discordTool = discordTool;
         this.commandHandlers = commandHandlers;
     }
 

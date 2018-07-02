@@ -21,7 +21,6 @@ public class ListSessionCommandHandler extends PrivateMessageCommandHandler {
     
     private static final String fromOptionName = "from";
     private final SessionComponent sessionComponent;
-    private final DiscordTool discordTool;
 
     @Autowired
     public ListSessionCommandHandler(SessionComponent sessionComponent,
@@ -37,7 +36,6 @@ public class ListSessionCommandHandler extends PrivateMessageCommandHandler {
                 .example("!session:list from 2018-01-01")
                 .build()
         );
-        this.discordTool = discordTool;
         this.sessionComponent = sessionComponent;
     }
 

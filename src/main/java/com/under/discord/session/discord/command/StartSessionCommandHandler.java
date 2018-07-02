@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 public class StartSessionCommandHandler extends PrivateMessageCommandHandler {
 
     private final SessionComponent sessionComponent;
-    private final DiscordTool discordTool;
 
     @Autowired
     public StartSessionCommandHandler(SessionComponent sessionComponent,
@@ -20,7 +19,6 @@ public class StartSessionCommandHandler extends PrivateMessageCommandHandler {
         super( Command.builder("!session:start").build(), discordTool);
         this.command.setHelp( Help.builder(command).description("Start a session").build() );
         this.sessionComponent = sessionComponent;
-        this.discordTool = discordTool;
     }
 
     @Override
