@@ -34,9 +34,12 @@ public class Session {
         sessionTimer.leaveAll();
     }
 
+    public Long getSessionTimeFromLastEnter(String username) {
+        return sessionTimer.getTrackedTimeFromLastEnter(username);
+    }
+
     public Long getSessionTimeFor(String username) {
         return sessionTimer.getTrackedTime( username );
-
     }
 }
 

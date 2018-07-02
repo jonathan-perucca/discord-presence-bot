@@ -5,7 +5,7 @@ import com.under.discord.session.discord.DiscordTool;
 import com.under.discord.session.domain.Session;
 import com.under.discord.session.entity.SessionRecord;
 import com.under.discord.session.event.SessionStopped;
-import net.dv8tion.jda.core.entities.User;
+import com.under.discord.session.mapper.SessionMapper;
 import net.dv8tion.jda.core.events.message.GenericMessageEvent;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,23 +13,23 @@ import org.springframework.context.event.EventListener;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
 import java.util.List;
-import java.util.Set;
 
 import static java.lang.String.format;
-import static java.util.stream.Collectors.toList;
 
 @Component
 public class SessionFlusher {
 
     private final SessionComponent sessionComponent;
+    private final SessionMapper sessionMapper;
     private final DiscordTool discordTool;
 
     @Autowired
     public SessionFlusher(SessionComponent sessionComponent,
+                          SessionMapper sessionMapper,
                           DiscordTool discordTool) {
         this.sessionComponent = sessionComponent;
+        this.sessionMapper = sessionMapper;
         this.discordTool = discordTool;
     }
 
@@ -37,12 +37,8 @@ public class SessionFlusher {
     public void on(SessionStopped sessionStoppedEvent) {
         Session session = sessionStoppedEvent.getSession();
         GenericMessageEvent event = sessionStoppedEvent.getEvent();
-        LocalDate startDate = session.getStartDate();
-        Set<User> userJoins = session.getUserJoins();
 
-        List<SessionRecord> sessionRecords = userJoins.stream()
-                .map(user -> newSessionRecord(startDate, user, session.getSessionTimeFor(user.getName())))
-                .collect(toList());
+        List<SessionRecord> sessionRecords = sessionMapper.toRecord( session, false );
 
         session.stop();
         PrivateMessageReceivedEvent receivedEvent = ( event != null ) ? PrivateMessageReceivedEvent.class.cast( event ) : null;
@@ -61,13 +57,5 @@ public class SessionFlusher {
                 }
             }
         }
-    }
-
-    private SessionRecord newSessionRecord(LocalDate startDate, User user, Long timeSpentInSeconds) {
-        return SessionRecord.builder()
-                .startDate(startDate)
-                .user(user.getName())
-                .timeSpentInSeconds(timeSpentInSeconds)
-                .build();
     }
 }

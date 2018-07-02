@@ -1,7 +1,5 @@
 # Bot commands
 
-## !start & !stop
-
 #### Start a session
 ```bash 
     !session:start          
@@ -12,8 +10,15 @@
     !session:stop
 ```
 
+#### Presence list of current session
 
-## !session:list
+```bash
+    !session:current
+```
+#### All presence list sessions
+```bash
+    !session:all      
+```
 
 #### Presence list of every users of every sessions since "from_date"
 
@@ -23,17 +28,8 @@
 
 example: `!session:list from 2018-01-01`
 
-### !session:list -- mandatory
+### mandatory
 * from `<from_date>`
-
-## !session:all
-
-#### All presence list sessions
-```bash
-    !session:all      
-```
-
-## !session:stats
 
 #### Presence statistics of every users of every sessions since "from_date"
 
@@ -42,16 +38,16 @@ example: `!session:list from 2018-01-01`
 ```
 
 
-#### !session:stats -- examples
+#### examples
 
 `!session:stats from 2018-01-01`
 
 `!session:stats from 2018-01-01 csv`
 
-#### !session:stats -- mandatory
+#### mandatory
 * from `<from_date>`
 
-#### !session:stats -- optional
+#### optional
 * csv
 
 from_date
@@ -60,18 +56,17 @@ from_date
 (optional) csv
 - provide report as csv file
 
-## !session:remove 
 
 #### Remove a user presence of a specific session
 ```bash
     !session:remove user <user_name> on <session_date>
 ```
 
-#### !session:remove -- examples
+#### examples
 
 `!session:remove user under on 2018-02-10`
 
-#### !session:remove -- mandatory
+#### mandatory
 
 * user <user_name> -- mandatory
 * on <session_date> -- mandatory
@@ -106,7 +101,7 @@ Follow this tutorial : [How to register a discord bot](https://github.com/reacti
 
 #### Launch configuration file
 
-###### application.properties
+###### in your path_to_conf_folder, create application.properties with following variable to replace
 ```
     BOT_TOKEN=... // your bot token
     bot.admin-names=... // comma-seperated values - discord user nicknames authorized to query the bot

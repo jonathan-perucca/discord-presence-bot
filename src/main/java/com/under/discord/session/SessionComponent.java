@@ -7,6 +7,7 @@ import com.under.discord.session.domain.SessionTimer;
 import com.under.discord.session.entity.SessionRecord;
 import com.under.discord.session.entity.SessionRecordRepository;
 import com.under.discord.session.event.SessionStopped;
+import com.under.discord.session.mapper.SessionMapper;
 import net.dv8tion.jda.core.events.message.GenericMessageEvent;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -29,15 +31,18 @@ public class SessionComponent {
 
     private static final Logger logger = getLogger(SessionComponent.class);
     private final ApplicationEventPublisher eventPublisher;
+    private final SessionMapper sessionMapper;
     private final SessionRecordRepository sessionRecordRepository;
     private final BotProperties botProperties;
     private Optional<Session> currentSession;
 
     @Autowired
     public SessionComponent(ApplicationEventPublisher eventPublisher,
-                            SessionRecordRepository sessionRecordRepository, 
+                            SessionMapper sessionMapper,
+                            SessionRecordRepository sessionRecordRepository,
                             BotProperties botProperties) {
         this.eventPublisher = eventPublisher;
+        this.sessionMapper = sessionMapper;
         this.sessionRecordRepository = sessionRecordRepository;
         this.botProperties = botProperties;
         this.currentSession = Optional.empty();
@@ -51,6 +56,15 @@ public class SessionComponent {
     @Transactional
     public void save(SessionRecord sessionRecord) {
         sessionRecordRepository.save(sessionRecord);
+    }
+
+    public List<SessionRecord> getCurrentSessionRecords() {
+        Optional<Session> currentSession = getCurrentSession();
+        if( !currentSession.isPresent() ) {
+            return Collections.emptyList();
+        }
+
+        return sessionMapper.toRecord( currentSession.get(), true );
     }
 
     @Transactional(readOnly = true)

@@ -6,6 +6,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static com.under.discord.session.domain.VoiceChannelEvent.ENTER;
 import static com.under.discord.session.domain.VoiceChannelEvent.LEAVE;
@@ -24,17 +25,17 @@ public class TimeTracker {
         timeTracks.add(userTimeTrack);
     }
 
-    public Long getTotalTimeSeconds() {
+    public Long getTotalTimeSeconds( Optional<LocalDateTime> fromOption ) {
         Duration duration = Duration.ofSeconds(0);
         
         UserTimeTrack holder = null;
-        for (UserTimeTrack timeTrack : timeTracks) {
+        for( UserTimeTrack timeTrack : timeTracks ) {
             VoiceChannelEvent event = timeTrack.getEvent();
-            if(event == ENTER) {
+            if( event == ENTER ) {
                 holder = timeTrack;
                 continue;
             }
-            if(event == LEAVE && holder != null) {
+            if( event == LEAVE && holder != null ) {
                 LocalDateTime enterDateTime = holder.getDateTime();
                 LocalDateTime leaveDateTime = timeTrack.getDateTime();
 
@@ -42,6 +43,11 @@ public class TimeTracker {
                 duration = duration.plus(timeSpent);
                 holder = null;
             }
+        }
+
+        boolean isLastEventAnEnter = holder != null;
+        if( fromOption.isPresent() && duration.getSeconds() == 0 && isLastEventAnEnter) {
+            return Duration.between( holder.getDateTime(), fromOption.get() ).getSeconds();
         }
         
         return duration.getSeconds();

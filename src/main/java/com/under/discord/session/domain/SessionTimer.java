@@ -2,6 +2,7 @@ package com.under.discord.session.domain;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.under.discord.session.domain.VoiceChannelEvent.ENTER;
 import static com.under.discord.session.domain.VoiceChannelEvent.LEAVE;
@@ -34,9 +35,19 @@ public class SessionTimer {
         );
     }
 
+    Long getTrackedTimeFromLastEnter(String username) {
+        if( !userTimeTrackers.containsKey(username) ) {
+            return 0L;
+        }
+
+        return userTimeTrackers
+                .get(username)
+                .getTotalTimeSeconds( Optional.of(now()) );
+    }
+
     Long getTrackedTime(String username) {
         return userTimeTrackers
                 .getOrDefault(username, new TimeTracker())
-                .getTotalTimeSeconds();
+                .getTotalTimeSeconds( Optional.empty() );
     }
 }
