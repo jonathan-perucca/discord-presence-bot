@@ -2,6 +2,7 @@ bot:
   token: ${BOT_TOKEN}
   admin-names: under
   session-time-seconds: ${SESSION_TIME:1200}
+  monitoring-guild: ${GUILD_NAME}
   
   
 # cron parts

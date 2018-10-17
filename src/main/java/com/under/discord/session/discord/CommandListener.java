@@ -40,4 +40,8 @@ public class CommandListener extends ListenerAdapter {
                 .filter(commandHandler -> commandHandler.supports(event))
                 .forEach(commandHandler -> commandHandler.apply(event));
     }
+
+    public List<CommandHandler> getCommandHandlers() {
+        return commandHandlers;
+    }
 }

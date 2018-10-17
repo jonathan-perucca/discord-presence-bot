@@ -28,4 +28,19 @@ public class BotProperties {
      * per user in order to have a validated session presence
      */
     private Long sessionTimeSeconds;
+
+    /**
+     * Discord guild name to monitor
+     */
+    private String monitoringGuild;
+
+    @Override
+    public String toString() {
+        String separator = System.lineSeparator();
+
+        return separator + "======= Bot configuration =======" + separator +
+                "bot admins : " + String.join(",", adminNames) + separator +
+                "session to stay to have a valid session (in seconds) : " + sessionTimeSeconds + separator +
+                "guild monitored : " + monitoringGuild + separator;
+    }
 }

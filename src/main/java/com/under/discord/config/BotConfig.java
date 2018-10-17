@@ -35,9 +35,12 @@ public class BotConfig {
                 .setToken(botProperties.getToken())
                 .addEventListener(botListeners.toArray());
 
-        logListeners(botListeners);
+        JDA jda = builder.buildAsync();
 
-        return builder.buildAsync();
+        logListeners(botListeners);
+        logger.info( botProperties.toString() );
+
+        return jda;
     }
 
     private void logListeners(List<EventListener> botListeners) {

@@ -4,6 +4,7 @@
 ```bash 
     !session:start          
 ```
+_NB: Every currently connected user to any voice channel will be considered as part of the started session_
 
 #### Stop a session
 ```bash        
@@ -104,6 +105,7 @@ Follow this tutorial : [How to register a discord bot](https://github.com/reacti
 ###### in your path_to_conf_folder, create application.properties with following variable to replace
 ```
     BOT_TOKEN=... // your bot token
+    GUILD_NAME=... // the discord server name to monitor 
     bot.admin-names=... // comma-seperated values - discord user nicknames authorized to query the bot
     bot.session-time-seconds=1200 // minimal amount of seconds needed per user for validating a session
     cron.session.start=0 0 21 * * WED
