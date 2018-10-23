@@ -44,6 +44,10 @@ public class TimeTracker {
                 holder = null;
             }
         }
+        if(holder != null) {
+            Duration timeSpent = Duration.between( holder.getDateTime(), LocalDateTime.now() );
+            duration = duration.plus(timeSpent);
+        }
 
         boolean isLastEventAnEnter = holder != null;
         if( fromOption.isPresent() && duration.getSeconds() == 0 && isLastEventAnEnter) {
