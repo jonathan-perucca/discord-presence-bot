@@ -2,6 +2,7 @@ package com.under.discord.session.discord.tool;
 
 import com.under.discord.session.domain.SessionRecordStatistic;
 import com.under.discord.session.entity.SessionRecord;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -14,7 +15,13 @@ import static java.util.stream.Collectors.groupingBy;
 @Component
 public class Display {
 
+    private final DateTimeTool dateTimeTool;
     private final String SEPARATOR = "\n";
+
+    @Autowired
+    public Display(DateTimeTool dateTimeTool) {
+        this.dateTimeTool = dateTimeTool;
+    }
 
     public String recordsToText(List<SessionRecord> sessionRecords) {
         StringBuilder builder = new StringBuilder();
@@ -26,7 +33,7 @@ public class Display {
 
             builder.append( "Session of " ).append( sessionDate ).append( SEPARATOR );
             sessionRecordsEntry.forEach(sessionRecord -> {
-                String timeSpentHumanReadable = getTimeSpentReadable(sessionRecord);
+                String timeSpentHumanReadable = dateTimeTool.getTimeSpentReadable(sessionRecord);
 
                 builder.append( sessionRecord.getUser() )
                         .append( " - " )
@@ -36,15 +43,6 @@ public class Display {
         });
 
         return builder.append(" ").toString();
-    }
-
-    private String getTimeSpentReadable(SessionRecord sessionRecord) {
-        Long timeSpentInSeconds = sessionRecord.getTimeSpentInSeconds();
-        return format("%d Heures - %02d minutes - %02d seconds", 
-                timeSpentInSeconds / 3600, 
-                (timeSpentInSeconds % 3600) / 60, 
-                (timeSpentInSeconds % 60)
-        );
     }
 
     public String statsToText(List<SessionRecordStatistic> sessionRecordStats) {

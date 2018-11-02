@@ -42,6 +42,20 @@ public class SessionFlusher {
 
         session.stop();
         PrivateMessageReceivedEvent receivedEvent = ( event != null ) ? PrivateMessageReceivedEvent.class.cast( event ) : null;
+        if(receivedEvent == null) {
+            for (SessionRecord sessionRecord : sessionRecords) {
+                try {
+                    sessionComponent.save(sessionRecord);
+                } catch (RuntimeException ex) {
+                }
+            }
+            return;
+        }
+
+        this.saveAndReply(sessionRecords, receivedEvent);
+    }
+
+    private void saveAndReply(List<SessionRecord> sessionRecords, PrivateMessageReceivedEvent receivedEvent) {
         for (SessionRecord sessionRecord : sessionRecords) {
             if( !sessionComponent.isValid(sessionRecord) ) {
                 discordTool.reply(receivedEvent, format("User %s was not present enough time", sessionRecord.getUser()));
@@ -50,11 +64,8 @@ public class SessionFlusher {
 
             try {
                 sessionComponent.save(sessionRecord);
-
             } catch (DataIntegrityViolationException ex) {
-                if(receivedEvent != null) {
-                    discordTool.reply(receivedEvent, format("%s already registered", sessionRecord.getUser()) );
-                }
+                discordTool.reply(receivedEvent, format("%s already registered", sessionRecord.getUser()) );
             }
         }
     }
