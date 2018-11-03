@@ -10,20 +10,16 @@
     </div>
 
     <div v-if="hasCurrentSession" class="col-lg-8 p-0">
-      <span class="badge badge-info m-3">{{ sessionRecords.numberOfUsers }} members</span>
-      <span class="badge badge-info">{{ sessionRecords.sessionDate }}</span>
-      <ul class="list-group">
-        <li v-for="sessionRecord in sessionRecords.records" class="list-group-item d-flex justify-content-between align-items-center">
-          {{ sessionRecord.user }}
-          <span class="badge badge-primary">{{ sessionRecord.timeSpent }} seconds</span>
-        </li>
-      </ul>
+      <session-details :recordDTOs="sessionRecords"></session-details>
     </div>
   </div>
 </template>
 
 <script>
+import SessionDetails from "./SessionDetails.vue";
+
 export default {
+  components: {SessionDetails},
   name: 'Session',
   data () {
     return {

@@ -66,10 +66,3 @@ class SessionCommand {
     }
 }
 
-@NoArgsConstructor
-@AllArgsConstructor
-@Getter
-@Setter
-class HttpResponse {
-    private String message;
-}
