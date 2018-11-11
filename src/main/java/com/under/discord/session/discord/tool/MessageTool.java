@@ -1,10 +1,8 @@
 package com.under.discord.session.discord.tool;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.dataformat.csv.CsvMapper;
-import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import com.under.discord.session.domain.SessionRecordStatistic;
-import com.under.discord.session.domain.SessionRecordStatisticsCSV;
+import com.under.discord.session.tool.CsvStat;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.entities.PrivateChannel;
@@ -17,12 +15,12 @@ import java.util.List;
 @Slf4j
 @Component
 public class MessageTool {
-    
-    private final CsvMapper csvMapper;
+
+    private final CsvStat csvStat;
 
     @Autowired
-    public MessageTool(CsvMapper csvMapper) {
-        this.csvMapper = csvMapper;
+    public MessageTool(CsvStat csvStat) {
+        this.csvStat = csvStat;
     }
 
     public void reply(PrivateMessageReceivedEvent event, String message) {
@@ -31,11 +29,10 @@ public class MessageTool {
     }
 
     public void replyAsCsv(PrivateMessageReceivedEvent event, List<SessionRecordStatistic> sessionRecordStats) {
-        CsvSchema csvSchema = csvMapper.schemaFor(SessionRecordStatisticsCSV.class).withHeader();
         String recordsAsCSV;
 
         try {
-            recordsAsCSV = csvMapper.writer(csvSchema).writeValueAsString(sessionRecordStats);
+            recordsAsCSV = csvStat.toCsvText(sessionRecordStats);
         } catch (JsonProcessingException e) {
             String csvWriteErrorMessage = "Could not write CSV file";
 

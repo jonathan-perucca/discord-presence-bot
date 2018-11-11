@@ -1,7 +1,13 @@
 <template>
   <div class="row">
-    <div class="col-lg-12 p-2">
+    <div class="col-lg-10 p-2">
       <h1>{{ msg }}</h1>
+    </div>
+
+    <div class="col-lg-2 p-3">
+      <button @click="downloadAllStats()" class="btn btn-block btn-info">
+        Export CSV
+      </button>
     </div>
 
     <div v-for="session in sessions" class="col-lg-3 p-2">
@@ -45,6 +51,18 @@ export default {
     },
     selectSession(session) {
       this.sessionSelected = session;
+    },
+    downloadAllStats() {
+      fetch("http://localhost:8080/reports/export", { method: 'GET' })
+        .then(response => response.blob())
+        .then(blob => {
+          let a = window.document.createElement("a");
+          a.href = window.URL.createObjectURL(blob, {type: "text/plain"});
+          a.download = "export.csv";
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        })
     }
   }
 }

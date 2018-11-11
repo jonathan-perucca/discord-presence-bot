@@ -79,7 +79,7 @@ public class SessionComponent {
     public List<SessionRecord> getSessionRecordsFrom(LocalDate fromDate) {
         return sessionRecordRepository.findByStartDateEqualOrAfter(fromDate);
     }
-    
+
     @Transactional(readOnly = true)
     public List<SessionRecordStatistic> getSessionRecordStatsFrom(LocalDate fromDate) {
         return sessionRecordRepository.findByStartDateEqualOrAfter(fromDate)

@@ -5,8 +5,8 @@
     </div>
     <div class="col-lg-4 p-2">
 
-      <div @click="startSession()" :class="{'d-none': activeSession}" class="btn btn-primary btn-lg">Start</div>
-      <div @click="stopSession()" :class="{'d-none': !activeSession}" class="btn btn-danger btn-lg">Stop</div>
+      <div @click="startSession()" :class="{'d-none': activeSession}" class="btn btn-primary btn-block mt-2">Start</div>
+      <div @click="stopSession()" :class="{'d-none': !activeSession}" class="btn btn-danger btn-block">Stop</div>
     </div>
 
     <div v-if="hasCurrentSession" class="col-lg-8 p-0">

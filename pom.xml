@@ -25,7 +25,8 @@
 		<jda.version>3.3.1_299</jda.version>
 		<json.version>20160810</json.version>
         <jackson-dataformat-csv.version>2.9.4</jackson-dataformat-csv.version>
-    </properties>
+		<commons-io.version>2.5</commons-io.version>
+	</properties>
 
 	<dependencies>
 		<dependency>
@@ -42,6 +43,12 @@
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
         </dependency>
+
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>${commons-io.version}</version>
+		</dependency>
 
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
